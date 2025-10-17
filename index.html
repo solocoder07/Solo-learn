@@ -1,0 +1,1218 @@
+# Solo-learn
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Ascend: Level Up Your Studies</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-glow-color: rgba(0, 191, 255, 0.5);
+            --secondary-glow-color: rgba(186, 85, 211, 0.5);
+            --legendary-glow-color: rgba(245, 158, 11, 0.6);
+            --primary-text-color: #00BFFF;
+            --secondary-text-color: #BA55D3;
+            --legendary-text-color: #f59e0b;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #10111A;
+            color: #E0E0E0;
+            overflow-x: hidden;
+        }
+
+        .font-orbitron {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .glass-pane {
+            background: rgba(16, 17, 26, 0.6);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 191, 255, 0.2);
+            transition: all 0.3s ease-in-out;
+        }
+
+        .text-glow-blue {
+            color: var(--primary-text-color);
+            text-shadow: 0 0 5px var(--primary-glow-color), 0 0 10px var(--primary-glow-color);
+        }
+        .text-glow-purple {
+            color: var(--secondary-text-color);
+            text-shadow: 0 0 5px var(--secondary-glow-color), 0 0 10px var(--secondary-glow-color);
+        }
+        .text-glow-legendary {
+            color: var(--legendary-text-color);
+            text-shadow: 0 0 6px var(--legendary-glow-color), 0 0 12px var(--legendary-glow-color);
+        }
+        .box-glow-blue {
+            box-shadow: 0 0 8px var(--primary-glow-color), 0 0 16px var(--primary-glow-color);
+        }
+        .box-glow-purple {
+             box-shadow: 0 0 8px var(--secondary-glow-color), 0 0 16px var(--secondary-glow-color);
+        }
+        .box-glow-legendary {
+             box-shadow: 0 0 10px var(--legendary-glow-color), 0 0 20px var(--legendary-glow-color);
+             border-color: rgba(245, 158, 11, 0.4);
+        }
+        .rarity-common { color: #E0E0E0; }
+        .rarity-uncommon { color: #22c55e; text-shadow: 0 0 4px #22c55e; }
+        .rarity-rare { color: #3b82f6; text-shadow: 0 0 5px #3b82f6; }
+        .rarity-epic { color: #a855f7; text-shadow: 0 0 6px #a855f7; }
+        .rarity-legendary { color: #f59e0b; text-shadow: 0 0 8px #f59e0b, 0 0 12px #f59e0b; }
+
+        .exp-bar-container {
+            background-color: #2D3748;
+            border: 1px solid rgba(0, 191, 255, 0.3);
+        }
+        .exp-bar-fill {
+            background: linear-gradient(90deg, var(--primary-text-color) 0%, var(--secondary-text-color) 100%);
+            transition: width 0.5s ease-in-out;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #1A202C; }
+        ::-webkit-scrollbar-thumb {
+            background-color: var(--primary-text-color);
+            border-radius: 4px;
+            border: 2px solid #1A202C;
+        }
+        
+        .quest-checkbox {
+            appearance: none;
+            min-width: 20px;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--primary-text-color);
+            border-radius: 4px;
+            cursor: pointer;
+            position: relative;
+            background-color: transparent;
+            transition: background-color 0.2s;
+        }
+        .quest-checkbox:checked {
+            background-color: var(--primary-text-color);
+            box-shadow: 0 0 8px var(--primary-glow-color);
+        }
+        .quest-checkbox:checked::after {
+            content: '✔';
+            font-size: 14px;
+            color: #10111A;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .tab-button {
+            transition: color 0.2s ease-in-out, text-shadow 0.2s ease-in-out;
+        }
+
+        @keyframes levelUpPulse {
+            0% { box-shadow: 0 0 8px var(--primary-glow-color), 0 0 16px var(--primary-glow-color); }
+            50% { box-shadow: 0 0 16px #f59e0b, 0 0 32px #f59e0b; }
+            100% { box-shadow: 0 0 8px var(--primary-glow-color), 0 0 16px var(--primary-glow-color); }
+        }
+        .level-up-animation {
+            animation: levelUpPulse 1.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        #system-message-modal {
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+        }
+        .modal-enter {
+            opacity: 1 !important;
+            transform: scale(1) !important;
+            pointer-events: auto !important;
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-6 lg:p-8">
+    
+    <!-- System Message Modal -->
+    <div id="system-message-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 opacity-0 scale-95 pointer-events-none">
+        <div class="glass-pane box-glow-blue rounded-lg p-6 w-11/12 md:w-1/3 text-center">
+            <h3 id="system-message-title" class="text-xl font-orbitron text-glow-blue mb-4">SYSTEM NOTIFICATION</h3>
+            <p id="system-message-text" class="mb-6"></p>
+            <button id="system-message-close" class="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded transition-transform transform hover:scale-105">
+                Confirm
+            </button>
+        </div>
+    </div>
+    
+    <!-- Dungeon / Focus Session Modal -->
+    <div id="dungeon-modal" class="fixed inset-0 bg-black bg-opacity-90 flex-col items-center justify-center z-40 hidden">
+        <div class="text-center">
+            <h2 class="text-4xl font-orbitron text-glow-purple mb-4">ENTERING FOCUS DUNGEON</h2>
+            <p id="dungeon-task-name" class="text-xl text-gray-300 mb-8"></p>
+            <div id="dungeon-timer" class="text-8xl font-orbitron text-glow-blue mb-8">25:00</div>
+            <div class="flex space-x-4">
+                 <button id="dungeon-complete-btn" class="bg-green-600 hover:bg-green-500 text-white font-bold py-3 px-6 rounded-lg transition-transform transform hover:scale-105">
+                    Complete Early
+                </button>
+                <button id="dungeon-exit-btn" class="bg-red-600 hover:bg-red-500 text-white font-bold py-3 px-6 rounded-lg transition-transform transform hover:scale-105">
+                    Abandon Dungeon
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Left Column -->
+        <div class="lg:col-span-1 space-y-6">
+            <header class="text-center lg:text-left">
+                <h1 class="text-4xl font-orbitron text-glow-blue">PROJECT ASCEND</h1>
+                <p class="text-blue-300">Arise, Scholar. It's time to Level Up.</p>
+            </header>
+            
+            <!-- Status Pane -->
+            <div id="status-pane" class="glass-pane p-5 rounded-lg box-glow-blue">
+                <h2 class="text-2xl font-orbitron text-glow-blue border-b border-blue-500/30 pb-2 mb-4">STATUS</h2>
+                <div class="space-y-4">
+                    <div><span class="text-gray-400">Name:</span> <span id="user-name" class="font-bold text-lg">Scholar</span></div>
+                    <div><span class="text-gray-400">Title:</span> <span id="user-title" class="font-bold text-lg rarity-legendary">[Newbie]</span></div>
+                    <div>
+                        <div class="flex justify-between items-baseline mb-1">
+                            <span class="text-gray-400">Level: <span id="user-level" class="font-bold text-xl text-white">1</span></span>
+                            <span id="exp-text" class="text-sm text-blue-300">0 / 100 EXP</span>
+                        </div>
+                        <div class="exp-bar-container w-full h-4 rounded-full overflow-hidden">
+                            <div id="exp-bar" class="exp-bar-fill h-full rounded-full" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                    <div><span class="text-gray-400">Rank:</span> <span id="user-rank" class="font-bold text-lg text-green-400">[F-Rank Scholar]</span></div>
+                </div>
+            </div>
+
+            <!-- Tabbed Pane -->
+            <div class="glass-pane p-5 rounded-lg box-glow-blue">
+                <div id="tab-buttons" class="flex justify-around border-b border-blue-500/30 mb-4">
+                    <button data-tab="inventory" class="tab-button p-2 font-orbitron text-glow-blue">INVENTORY</button>
+                    <button data-tab="stats" class="tab-button p-2 font-orbitron text-gray-400">STATS</button>
+                    <button data-tab="log" class="tab-button p-2 font-orbitron text-gray-400">LOG</button>
+                    <button data-tab="settings" class="tab-button p-2 font-orbitron text-gray-400">SYSTEM</button>
+                </div>
+                <div id="tab-content" class="max-h-60 overflow-y-auto pr-2">
+                    <!-- Content will be dynamically inserted here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="lg:col-span-2 space-y-6">
+
+            <!-- Urgent Quest Pane -->
+            <div id="urgent-quest-pane" class="glass-pane p-5 rounded-lg box-glow-legendary hidden">
+                 <div class="flex justify-between items-center border-b border-amber-500/30 pb-2 mb-4">
+                    <h2 class="text-2xl font-orbitron text-glow-legendary">URGENT QUEST</h2>
+                    <div id="urgent-quest-timer" class="text-lg font-orbitron text-amber-300"></div>
+                </div>
+                <div id="urgent-quest-content"></div>
+            </div>
+
+            <!-- Daily Quests Pane -->
+            <div class="glass-pane p-5 rounded-lg box-glow-purple">
+                <h2 class="text-2xl font-orbitron text-glow-purple border-b border-purple-500/30 pb-2 mb-4">DAILY QUESTS</h2>
+                <div id="daily-quests-list" class="space-y-3"></div>
+            </div>
+
+            <!-- Main Quests Pane -->
+            <div class="glass-pane p-5 rounded-lg">
+                <div class="flex justify-between items-center border-b border-blue-500/30 pb-2 mb-4">
+                    <h2 class="text-2xl font-orbitron text-glow-blue">MAIN QUESTS</h2>
+                    <div class="flex space-x-2">
+                        <button id="add-quest-btn" title="Add Custom Quest" class="bg-blue-600 text-white w-8 h-8 rounded flex items-center justify-center hover:bg-blue-500 transition-transform transform hover:scale-105">+</button>
+                    </div>
+                </div>
+                <!-- Add Quest Form -->
+                <div class="flex items-center space-x-2 mb-4 hidden" id="add-quest-form">
+                    <input type="text" id="new-quest-input" class="bg-gray-800 border border-gray-600 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter new quest description...">
+                    <button id="save-quest-btn" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-500">Save</button>
+                </div>
+                <div id="main-quests-list" class="space-y-3 max-h-[26rem] overflow-y-auto pr-2">
+                    <p class="text-gray-500">No main quests accepted. Click '+' to add one.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- DATA POOLS ---
+            const DAILY_QUEST_POOL = [
+                { description: 'Review the key principles of IAS 16 (PPE) for 15 mins', exp: 60 },
+                { description: 'Attempt 3 multiple-choice questions on IFRS 15 (Revenue)', exp: 50 },
+                { description: 'Watch a 10-minute video explaining IAS 37 (Provisions)', exp: 40 },
+                { description: 'Write a one-paragraph summary of the Conceptual Framework', exp: 70 },
+                { description: 'Go over 5 flashcards for IFRS 9 (Financial Instruments)', exp: 40 },
+                { description: 'Calculate a basic goodwill working from a past paper', exp: 80 },
+                { description: 'Explain the difference between a finance and operating lease (IFRS 16)', exp: 75 },
+                { description: 'Solve a basic earnings per share (EPS) calculation', exp: 60 },
+                { description: 'Review the disclosure requirements for a non-current asset', exp: 50 },
+                { description: 'Attempt a statement of changes in equity (SOCIE) question', exp: 90 },
+                { description: 'Read through the definition of "control" under IFRS 10', exp: 40 },
+                { description: 'Practice a revaluation of a non-current asset', exp: 70 },
+                { description: 'Identify 3 events after the reporting period (IAS 10)', exp: 50 },
+                { description: 'List the 5 components of Other Comprehensive Income (OCI)', exp: 60 },
+                { description: 'Spend 20 minutes reviewing notes on a weak F7 topic', exp: 80 },
+                { description: 'Complete one Section A question set (2 MCQs) from a practice kit', exp: 100 },
+                { description: 'Review the pro-forma for a consolidated statement of profit or loss', exp: 70 },
+                { description: 'Plan your study schedule for the rest of the week, focusing on F7 topics', exp: 40 },
+            ];
+             const URGENT_QUEST_POOL = [
+                { description: 'Complete a full Section C question on consolidated financial statements under timed conditions.', exp: 500 },
+                { description: 'Attempt an entire 30-mark Section C interpretation of financial statements question.', exp: 450 },
+                { description: 'Draft a complete Statement of Cash Flows (IAS 7) from a complex scenario.', exp: 400 },
+                { description: 'Create a comprehensive study guide/mind map for group accounts (IFRS 10, IFRS 3).', exp: 350 },
+                { description: 'Complete all Section A & B questions from a recent F7 past paper.', exp: 600 },
+                { description: 'Teach the principles of IFRS 16 (Leases) to a friend until they understand it.', exp: 300 },
+            ];
+            const THEMES = {
+                // --- START OF ADDED THEMES ---
+                'Default': { name: 'Default', primary: '#00BFFF', secondary: '#BA55D3' },
+                'Forest Green': { name: 'Forest Green', primary: '#228B22', secondary: '#3CB371' },
+                'Ocean Blue': { name: 'Ocean Blue', primary: '#1E90FF', secondary: '#00BFFF' },
+                'Demonic Red': { name: 'Demonic Red', primary: '#DC143C', secondary: '#FF4500' },
+                'Arcane Purple': { name: 'Arcane Purple', primary: '#9370DB', secondary: '#BA55D3' },
+                'Monarch Gold': { name: 'Monarch Gold', primary: '#FFD700', secondary: '#FFA500' },
+                'Cyberpunk Neon': { name: 'Cyberpunk Neon', primary: '#00FFFF', secondary: '#FF00FF' },
+                'Glacial Ice': { name: 'Glacial Ice', primary: '#A5F2F3', secondary: '#70D7FF' },
+                'Blood Moon': { name: 'Blood Moon', primary: '#9B111E', secondary: '#E34234' },
+                'Solar Flare': { name: 'Solar Flare', primary: '#FFBF00', secondary: '#FF6700' },
+                'Cosmic Void': { name: 'Cosmic Void', primary: '#4B0082', secondary: '#FFFFFF' },
+                'Sakura Blossom': { name: 'Sakura Blossom', primary: '#FFB7C5', secondary: '#FFFFFF' },
+                'Jungle Camo': { name: 'Jungle Camo', primary: '#556B2F', secondary: '#808000' },
+                'Royal Amethyst': { name: 'Royal Amethyst', primary: '#9966CC', secondary: '#E6E6FA' },
+                'Synthwave Sunset': { name: 'Synthwave Sunset', primary: '#FF33A8', secondary: '#FF8800' },
+                'Emerald Dragon': { name: 'Emerald Dragon', primary: '#00A550', secondary: '#B8860B' },
+                'Arctic Wolf': { name: 'Arctic Wolf', primary: '#EAEAEA', secondary: '#4682B4' },
+                'Volcanic Ash': { name: 'Volcanic Ash', primary: '#5A5A5A', secondary: '#FF4500' },
+                'Deep Sea': { name: 'Deep Sea', primary: '#005792', secondary: '#00A8CC' },
+                'Sandstorm': { name: 'Sandstorm', primary: '#C2B280', secondary: '#8B4513' },
+                'Toxic Waste': { name: 'Toxic Waste', primary: '#7FFF00', secondary: '#8A2BE2' },
+                'Gilded Ivory': { name: 'Gilded Ivory', primary: '#FFF8DC', secondary: '#DAA520' },
+                'Hacker Mint': { name: 'Hacker Mint', primary: '#00FF7F', secondary: '#E0E0E0' },
+                'Crimson Knight': { name: 'Crimson Knight', primary: '#DC143C', secondary: '#C0C0C0' },
+                'Starlight': { name: 'Starlight', primary: '#E3E4FA', secondary: '#F8F8FF' },
+                'Abyssal Depths': { name: 'Abyssal Depths', primary: '#000080', secondary: '#483D8B' },
+                'Rose Gold': { name: 'Rose Gold', primary: '#B76E79', secondary: '#FADADD' },
+                'Thunderstorm': { name: 'Thunderstorm', primary: '#36454F', secondary: '#FFD700' },
+                'Desert Oasis': { name: 'Desert Oasis', primary: '#008B8B', secondary: '#F0E68C' },
+                'Phoenix Fire': { name: 'Phoenix Fire', primary: '#FF4500', secondary: '#FFD700' },
+                'Ghostly Whisper': { name: 'Ghostly Whisper', primary: '#F8F8FF', secondary: '#B0C4DE' },
+                'Ancient Parchment': { name: 'Ancient Parchment', primary: '#F5DEB3', secondary: '#8B4513' },
+                'Celestial Sky': { name: 'Celestial Sky', primary: '#87CEEB', secondary: '#FFFFFF' },
+                'Iron Forge': { name: 'Iron Forge', primary: '#A9A9A9', secondary: '#FF8C00' },
+                'Elvenwood': { name: 'Elvenwood', primary: '#228B22', secondary: '#DAA520' },
+                'Dwarven Mithril': { name: 'Dwarven Mithril', primary: '#B0C4DE', secondary: '#708090' },
+                'Inferno': { name: 'Inferno', primary: '#FF2400', secondary: '#FF7F50' },
+                'Winterfall': { name: 'Winterfall', primary: '#ADD8E6', secondary: '#FFFFFF' },
+                'Shadow Syndicate': { name: 'Shadow Syndicate', primary: '#4B0082', secondary: '#8A2BE2' },
+                'Aetherium Glow': { name: 'Aetherium Glow', primary: '#00FFFF', secondary: '#DA70D6' },
+                'Chrono Shift': { name: 'Chrono Shift', primary: '#008080', secondary: '#DAA520' },
+                'Quantum Foam': { name: 'Quantum Foam', primary: '#4CBB17', secondary: '#AFE1AF' },
+                'Nebula Haze': { name: 'Nebula Haze', primary: '#DA70D6', secondary: '#EE82EE' },
+                'Graphene Grid': { name: 'Graphene Grid', primary: '#808080', secondary: '#00FFFF' },
+                'Terraform': { name: 'Terraform', primary: '#A0522D', secondary: '#2E8B57' },
+                'Blacklight': { name: 'Blacklight', primary: '#FF00FF', secondary: '#7FFF00' },
+                'Godspeed': { name: 'Godspeed', primary: '#FFD700', secondary: '#FFFFFF' },
+                'Paladin\'s Virtue': { name: 'Paladin\'s Virtue', primary: '#F0E68C', secondary: '#C0C0C0' },
+                'Warlock\'s Pact': { name: 'Warlock\'s Pact', primary: '#4B0082', secondary: '#7FFF00' },
+                'Druid\'s Grove': { name: 'Druid\'s Grove', primary: '#228B22', secondary: '#A0522D' },
+                'Rogue\'s Gambit': { name: 'Rogue\'s Gambit', primary: '#36454F', secondary: '#DC143C' },
+                // --- END OF ADDED THEMES ---
+            };
+            const REWARDS_POOL = [
+                // --- START OF MODIFIED/EXPANDED REWARDS ---
+                { name: '[Minor EXP Potion]', type: 'exp_potion', value: 50, rarity: 'common', description: 'Instantly grants 50 EXP.' },
+                { name: '[Common Material Shard]', type: 'material', rarity: 'common', description: 'A basic crafting material.' },
+                { name: '[Standard EXP Potion]', type: 'exp_potion', value: 150, rarity: 'uncommon', description: 'Instantly grants 150 EXP.' },
+                { name: '[Rest Token]', type: 'rest_token', rarity: 'uncommon', description: 'Instantly completes all daily quests for today.' },
+                { name: '[Quest Reroll Ticket]', type: 'quest_reroll', rarity: 'uncommon', description: 'Rerolls your current daily quests.' },
+                { name: '[Uncommon Material Chunk]', type: 'material', rarity: 'uncommon', description: 'An uncommon crafting material.' },
+                { name: '[Major EXP Potion]', type: 'exp_potion', value: 500, rarity: 'rare', description: 'Instantly grants 500 EXP.' },
+                { name: '[Rare Crystal]', type: 'material', rarity: 'rare', description: 'A rare and valuable crafting material.' },
+                { name: '[Superior EXP Potion]', type: 'exp_potion', value: 1500, rarity: 'epic', description: 'Instantly grants 1500 EXP.' },
+                { name: '[Instant Level Up Token]', type: 'level_up_token', rarity: 'epic', description: 'Grants one full level.' },
+                { name: '[Epic Gem]', type: 'material', rarity: 'epic', description: 'An epic crafting material.' },
+                { name: '[Chalice of Enlightenment]', type: 'exp_potion', value: 5000, rarity: 'legendary', description: 'A legendary artifact that grants 5000 EXP.' },
+                { name: '[Title: The Awakened One]', type: 'title_unlock', title: '[The Awakened One]', rarity: 'legendary', description: 'A legendary title for those chosen by fate.' },
+                { name: '[Legendary Essence]', type: 'material', rarity: 'legendary', description: 'A fragment of pure knowledge.'},
+                // --- Original Theme Keys
+                { name: '[Theme Key: Forest Green]', type: 'theme_key', rarity: 'uncommon', colors: THEMES['Forest Green'], description: 'Unlocks the "Forest Green" UI theme.' },
+                { name: '[Theme Key: Ocean Blue]', type: 'theme_key', rarity: 'uncommon', colors: THEMES['Ocean Blue'], description: 'Unlocks the "Ocean Blue" UI theme.' },
+                { name: '[Theme Key: Demonic Red]', type: 'theme_key', rarity: 'rare', colors: THEMES['Demonic Red'], description: 'Unlocks the "Demonic Red" UI theme.' },
+                { name: '[Theme Key: Arcane Purple]', type: 'theme_key', rarity: 'rare', colors: THEMES['Arcane Purple'], description: 'Unlocks the "Arcane Purple" UI theme.' },
+                { name: '[Theme Key: Monarch Gold]', type: 'theme_key', rarity: 'epic', colors: THEMES['Monarch Gold'], description: 'Unlocks the "Monarch Gold" UI theme.' },
+                // --- 50 New Theme Keys as Rewards
+                { name: '[Theme Key: Cyberpunk Neon]', type: 'theme_key', rarity: 'epic', colors: THEMES['Cyberpunk Neon'], description: 'Unlocks the "Cyberpunk Neon" UI theme.' },
+                { name: '[Theme Key: Glacial Ice]', type: 'theme_key', rarity: 'uncommon', colors: THEMES['Glacial Ice'], description: 'Unlocks the "Glacial Ice" UI theme.' },
+                { name: '[Theme Key: Blood Moon]', type: 'theme_key', rarity: 'rare', colors: THEMES['Blood Moon'], description: 'Unlocks the "Blood Moon" UI theme.' },
+                { name: '[Theme Key: Solar Flare]', type: 'theme_key', rarity: 'rare', colors: THEMES['Solar Flare'], description: 'Unlocks the "Solar Flare" UI theme.' },
+                { name: '[Theme Key: Cosmic Void]', type: 'theme_key', rarity: 'epic', colors: THEMES['Cosmic Void'], description: 'Unlocks the "Cosmic Void" UI theme.' },
+                { name: '[Theme Key: Sakura Blossom]', type: 'theme_key', rarity: 'uncommon', colors: THEMES['Sakura Blossom'], description: 'Unlocks the "Sakura Blossom" UI theme.' },
+                { name: '[Theme Key: Jungle Camo]', type: 'theme_key', rarity: 'common', colors: THEMES['Jungle Camo'], description: 'Unlocks the "Jungle Camo" UI theme.' },
+                { name: '[Theme Key: Royal Amethyst]', type: 'theme_key', rarity: 'rare', colors: THEMES['Royal Amethyst'], description: 'Unlocks the "Royal Amethyst" UI theme.' },
+                { name: '[Theme Key: Synthwave Sunset]', type: 'theme_key', rarity: 'epic', colors: THEMES['Synthwave Sunset'], description: 'Unlocks the "Synthwave Sunset" UI theme.' },
+                { name: '[Theme Key: Emerald Dragon]', type: 'theme_key', rarity: 'legendary', colors: THEMES['Emerald Dragon'], description: 'Unlocks the "Emerald Dragon" UI theme.' },
+                { name: '[Theme Key: Arctic Wolf]', type: 'theme_key', rarity: 'uncommon', colors: THEMES['Arctic Wolf'], description: 'Unlocks the "Arctic Wolf" UI theme.' },
+                { name: '[Theme Key: Volcanic Ash]', type: 'theme_key', rarity: 'rare', colors: THEMES['Volcanic Ash'], description: 'Unlocks the "Volcanic Ash" UI theme.' },
+                { name: '[Theme Key: Deep Sea]', type: 'theme_key', rarity: 'uncommon', colors: THEMES['Deep Sea'], description: 'Unlocks the "Deep Sea" UI theme.' },
+                { name: '[Theme Key: Sandstorm]', type: 'theme_key', rarity: 'common', colors: THEMES['Sandstorm'], description: 'Unlocks the "Sandstorm" UI theme.' },
+                { name: '[Theme Key: Toxic Waste]', type: 'theme_key', rarity: 'rare', colors: THEMES['Toxic Waste'], description: 'Unlocks the "Toxic Waste" UI theme.' },
+                { name: '[Theme Key: Gilded Ivory]', type: 'theme_key', rarity: 'rare', colors: THEMES['Gilded Ivory'], description: 'Unlocks the "Gilded Ivory" UI theme.' },
+                { name: '[Theme Key: Hacker Mint]', type: 'theme_key', rarity: 'uncommon', colors: THEMES['Hacker Mint'], description: 'Unlocks the "Hacker Mint" UI theme.' },
+                { name: '[Theme Key: Crimson Knight]', type: 'theme_key', rarity: 'epic', colors: THEMES['Crimson Knight'], description: 'Unlocks the "Crimson Knight" UI theme.' },
+                { name: '[Theme Key: Starlight]', type: 'theme_key', rarity: 'uncommon', colors: THEMES['Starlight'], description: 'Unlocks the "Starlight" UI theme.' },
+                { name: '[Theme Key: Abyssal Depths]', type: 'theme_key', rarity: 'epic', colors: THEMES['Abyssal Depths'], description: 'Unlocks the "Abyssal Depths" UI theme.' },
+                { name: '[Theme Key: Rose Gold]', type: 'theme_key', rarity: 'rare', colors: THEMES['Rose Gold'], description: 'Unlocks the "Rose Gold" UI theme.' },
+                { name: '[Theme Key: Thunderstorm]', type: 'theme_key', rarity: 'rare', colors: THEMES['Thunderstorm'], description: 'Unlocks the "Thunderstorm" UI theme.' },
+                { name: '[Theme Key: Desert Oasis]', type: 'theme_key', rarity: 'uncommon', colors: THEMES['Desert Oasis'], description: 'Unlocks the "Desert Oasis" UI theme.' },
+                { name: '[Theme Key: Phoenix Fire]', type: 'theme_key', rarity: 'legendary', colors: THEMES['Phoenix Fire'], description: 'Unlocks the "Phoenix Fire" UI theme.' },
+                { name: '[Theme Key: Ghostly Whisper]', type: 'theme_key', rarity: 'uncommon', colors: THEMES['Ghostly Whisper'], description: 'Unlocks the "Ghostly Whisper" UI theme.' },
+                { name: '[Theme Key: Ancient Parchment]', type: 'theme_key', rarity: 'common', colors: THEMES['Ancient Parchment'], description: 'Unlocks the "Ancient Parchment" UI theme.' },
+                { name: '[Theme Key: Celestial Sky]', type: 'theme_key', rarity: 'uncommon', colors: THEMES['Celestial Sky'], description: 'Unlocks the "Celestial Sky" UI theme.' },
+                { name: '[Theme Key: Iron Forge]', type: 'theme_key', rarity: 'common', colors: THEMES['Iron Forge'], description: 'Unlocks the "Iron Forge" UI theme.' },
+                { name: '[Theme Key: Elvenwood]', type: 'theme_key', rarity: 'rare', colors: THEMES['Elvenwood'], description: 'Unlocks the "Elvenwood" UI theme.' },
+                { name: '[Theme Key: Dwarven Mithril]', type: 'theme_key', rarity: 'rare', colors: THEMES['Dwarven Mithril'], description: 'Unlocks the "Dwarven Mithril" UI theme.' },
+                { name: '[Theme Key: Inferno]', type: 'theme_key', rarity: 'epic', colors: THEMES['Inferno'], description: 'Unlocks the "Inferno" UI theme.' },
+                { name: '[Theme Key: Winterfall]', type: 'theme_key', rarity: 'uncommon', colors: THEMES['Winterfall'], description: 'Unlocks the "Winterfall" UI theme.' },
+                { name: '[Theme Key: Shadow Syndicate]', type: 'theme_key', rarity: 'epic', colors: THEMES['Shadow Syndicate'], description: 'Unlocks the "Shadow Syndicate" UI theme.' },
+                { name: '[Theme Key: Aetherium Glow]', type: 'theme_key', rarity: 'legendary', colors: THEMES['Aetherium Glow'], description: 'Unlocks the "Aetherium Glow" UI theme.' },
+                { name: '[Theme Key: Chrono Shift]', type: 'theme_key', rarity: 'rare', colors: THEMES['Chrono Shift'], description: 'Unlocks the "Chrono Shift" UI theme.' },
+                { name: '[Theme Key: Quantum Foam]', type: 'theme_key', rarity: 'uncommon', colors: THEMES['Quantum Foam'], description: 'Unlocks the "Quantum Foam" UI theme.' },
+                { name: '[Theme Key: Nebula Haze]', type: 'theme_key', rarity: 'rare', colors: THEMES['Nebula Haze'], description: 'Unlocks the "Nebula Haze" UI theme.' },
+                { name: '[Theme Key: Graphene Grid]', type: 'theme_key', rarity: 'uncommon', colors: THEMES['Graphene Grid'], description: 'Unlocks the "Graphene Grid" UI theme.' },
+                { name: '[Theme Key: Terraform]', type: 'theme_key', rarity: 'common', colors: THEMES['Terraform'], description: 'Unlocks the "Terraform" UI theme.' },
+                { name: '[Theme Key: Blacklight]', type: 'theme_key', rarity: 'epic', colors: THEMES['Blacklight'], description: 'Unlocks the "Blacklight" UI theme.' },
+                { name: '[Theme Key: Godspeed]', type: 'theme_key', rarity: 'legendary', colors: THEMES['Godspeed'], description: 'Unlocks the "Godspeed" UI theme.' },
+                { name: '[Theme Key: Paladin\'s Virtue]', type: 'theme_key', rarity: 'rare', colors: THEMES['Paladin\'s Virtue'], description: 'Unlocks the "Paladin\'s Virtue" UI theme.' },
+                { name: '[Theme Key: Warlock\'s Pact]', type: 'theme_key', rarity: 'epic', colors: THEMES['Warlock\'s Pact'], description: 'Unlocks the "Warlock\'s Pact" UI theme.' },
+                { name: '[Theme Key: Druid\'s Grove]', type: 'theme_key', rarity: 'uncommon', colors: THEMES['Druid\'s Grove'], description: 'Unlocks the "Druid\'s Grove" UI theme.' },
+                { name: '[Theme Key: Rogue\'s Gambit]', type: 'theme_key', rarity: 'rare', colors: THEMES['Rogue\'s Gambit'], description: 'Unlocks the "Rogue\'s Gambit" UI theme.' },
+                // --- END OF MODIFIED/EXPANDED REWARDS ---
+            ];
+            const CRAFTING_RECIPES = [
+                // --- START OF EXPANDED CRAFTING RECIPES ---
+                { result: { name: '[Uncommon Material Chunk]', type: 'material', rarity: 'uncommon', description: 'An uncommon crafting material.' }, ingredients: [{ name: '[Common Material Shard]', count: 5 }] },
+                { result: { name: '[Minor EXP Potion]', type: 'exp_potion', value: 50, rarity: 'common', description: 'Instantly grants 50 EXP.' }, ingredients: [{ name: '[Common Material Shard]', count: 3 }] },
+                { result: { name: '[Rare Crystal]', type: 'material', rarity: 'rare', description: 'A rare crafting material.' }, ingredients: [{ name: '[Uncommon Material Chunk]', count: 5 }] },
+                { result: { name: '[Standard EXP Potion]', type: 'exp_potion', value: 150, rarity: 'uncommon', description: 'Instantly grants 150 EXP.' }, ingredients: [{ name: '[Uncommon Material Chunk]', count: 2 }, { name: '[Common Material Shard]', count: 3 }] },
+                { result: { name: '[Epic Gem]', type: 'material', rarity: 'epic', description: 'An epic crafting material.' }, ingredients: [{ name: '[Rare Crystal]', count: 5 }] },
+                { result: { name: '[Major EXP Potion]', type: 'exp_potion', value: 500, rarity: 'rare', description: 'Instantly grants 500 EXP.' }, ingredients: [{ name: '[Rare Crystal]', count: 2 }, { name: '[Uncommon Material Chunk]', count: 3 }] },
+                { result: { name: '[Legendary Essence]', type: 'material', rarity: 'legendary', description: 'A legendary crafting material.' }, ingredients: [{ name: '[Epic Gem]', count: 5 }] },
+                { result: { name: '[Superior EXP Potion]', type: 'exp_potion', value: 1500, rarity: 'epic', description: 'Instantly grants 1500 EXP.' }, ingredients: [{ name: '[Epic Gem]', count: 2 }, { name: '[Rare Crystal]', count: 3 }] },
+                { result: { name: '[Quest Reroll Ticket]', type: 'quest_reroll', rarity: 'uncommon', description: 'Rerolls your current daily quests.' }, ingredients: [{ name: '[Uncommon Material Chunk]', count: 3 }] },
+                { result: { name: '[Rest Token]', type: 'rest_token', rarity: 'uncommon', description: 'Instantly completes all daily quests for today.' }, ingredients: [{ name: '[Rare Crystal]', count: 2 }] },
+                { result: { name: '[Title: The Crafter]', type: 'title_unlock', title: '[The Crafter]', rarity: 'rare', description: 'A title for those who forge their own path.' }, ingredients: [{ name: '[Rare Crystal]', count: 5 }, { name: '[Uncommon Material Chunk]', count: 10 }] },
+                { result: { name: '[Chalice of Enlightenment]', type: 'exp_potion', value: 5000, rarity: 'legendary', description: 'A legendary artifact that grants 5000 EXP.' }, ingredients: [{ name: '[Legendary Essence]', count: 3 }, { name: '[Epic Gem]', count: 5 }] },
+                { result: { name: '[Random Common Theme Key]', type: 'random_theme_key', rarity: 'common', tier: 'common', description: 'Unlocks a random Common UI theme.' }, ingredients: [{ name: '[Common Material Shard]', count: 15 }] },
+                { result: { name: '[Random Uncommon Theme Key]', type: 'random_theme_key', rarity: 'uncommon', tier: 'uncommon', description: 'Unlocks a random Uncommon UI theme.' }, ingredients: [{ name: '[Uncommon Material Chunk]', count: 10 }] },
+                { result: { name: '[Random Rare Theme Key]', type: 'random_theme_key', rarity: 'rare', tier: 'rare', description: 'Unlocks a random Rare UI theme.' }, ingredients: [{ name: '[Rare Crystal]', count: 8 }] },
+                { result: { name: '[Random Epic Theme Key]', type: 'random_theme_key', rarity: 'epic', tier: 'epic', description: 'Unlocks a random Epic UI theme.' }, ingredients: [{ name: '[Epic Gem]', count: 6 }] },
+                { result: { name: '[Common Material Shard]', type: 'material', rarity: 'common', description: 'A basic crafting material.' }, ingredients: [{ name: '[Uncommon Material Chunk]', count: 1 }] },
+                { result: { name: '[Uncommon Material Chunk]', type: 'material', rarity: 'uncommon', description: 'An uncommon crafting material.' }, ingredients: [{ name: '[Rare Crystal]', count: 1 }] },
+                { result: { name: '[Rare Crystal]', type: 'material', rarity: 'rare', description: 'A rare crafting material.' }, ingredients: [{ name: '[Epic Gem]', count: 1 }] },
+                { result: { name: '[Epic Gem]', type: 'material', rarity: 'epic', description: 'An epic crafting material.' }, ingredients: [{ name: '[Legendary Essence]', count: 1 }] },
+                { result: { name: '[Minor Focus Draught]', type: 'temp_buff', buff: 'focus', value: 5, duration: 3600, rarity: 'common', description: 'Increases Focus by 5 for 1 hour.' }, ingredients: [{ name: '[Common Material Shard]', count: 10 }] },
+                { result: { name: '[Minor Wisdom Draught]', type: 'temp_buff', buff: 'wisdom', value: 5, duration: 3600, rarity: 'common', description: 'Increases Wisdom by 5 for 1 hour.' }, ingredients: [{ name: '[Common Material Shard]', count: 10 }] },
+                { result: { name: '[Minor Intelligence Draught]', type: 'temp_buff', buff: 'intelligence', value: 5, duration: 3600, rarity: 'common', description: 'Increases Intelligence by 5 for 1 hour.' }, ingredients: [{ name: '[Common Material Shard]', count: 10 }] },
+                { result: { name: '[Minor Diligence Draught]', type: 'temp_buff', buff: 'diligence', value: 5, duration: 3600, rarity: 'common', description: 'Increases Diligence by 5 for 1 hour.' }, ingredients: [{ name: '[Common Material Shard]', count: 10 }] },
+                { result: { name: '[Standard Focus Elixir]', type: 'temp_buff', buff: 'focus', value: 10, duration: 3600, rarity: 'uncommon', description: 'Increases Focus by 10 for 1 hour.' }, ingredients: [{ name: '[Uncommon Material Chunk]', count: 8 }] },
+                { result: { name: '[Standard Wisdom Elixir]', type: 'temp_buff', buff: 'wisdom', value: 10, duration: 3600, rarity: 'uncommon', description: 'Increases Wisdom by 10 for 1 hour.' }, ingredients: [{ name: '[Uncommon Material Chunk]', count: 8 }] },
+                { result: { name: '[Standard Intelligence Elixir]', type: 'temp_buff', buff: 'intelligence', value: 10, duration: 3600, rarity: 'uncommon', description: 'Increases Intelligence by 10 for 1 hour.' }, ingredients: [{ name: '[Uncommon Material Chunk]', count: 8 }] },
+                { result: { name: '[Standard Diligence Elixir]', type: 'temp_buff', buff: 'diligence', value: 10, duration: 3600, rarity: 'uncommon', description: 'Increases Diligence by 10 for 1 hour.' }, ingredients: [{ name: '[Uncommon Material Chunk]', count: 8 }] },
+                { result: { name: '[Major Focus Potion]', type: 'temp_buff', buff: 'focus', value: 20, duration: 3600, rarity: 'rare', description: 'Increases Focus by 20 for 1 hour.' }, ingredients: [{ name: '[Rare Crystal]', count: 6 }] },
+                { result: { name: '[Major Wisdom Potion]', type: 'temp_buff', buff: 'wisdom', value: 20, duration: 3600, rarity: 'rare', description: 'Increases Wisdom by 20 for 1 hour.' }, ingredients: [{ name: '[Rare Crystal]', count: 6 }] },
+                { result: { name: '[Major Intelligence Potion]', type: 'temp_buff', buff: 'intelligence', value: 20, duration: 3600, rarity: 'rare', description: 'Increases Intelligence by 20 for 1 hour.' }, ingredients: [{ name: '[Rare Crystal]', count: 6 }] },
+                { result: { name: '[Major Diligence Potion]', type: 'temp_buff', buff: 'diligence', value: 20, duration: 3600, rarity: 'rare', description: 'Increases Diligence by 20 for 1 hour.' }, ingredients: [{ name: '[Rare Crystal]', count: 6 }] },
+                { result: { name: '[Scroll of Insight]', type: 'special', effect: 'double_exp_1', rarity: 'rare', description: 'Doubles EXP gain from the next completed quest.' }, ingredients: [{ name: '[Rare Crystal]', count: 3 }, { name: '[Uncommon Material Chunk]', count: 5 }] },
+                { result: { name: '[Scroll of Fortune]', type: 'special', effect: 'guaranteed_reward_1', rarity: 'rare', description: 'Guarantees a reward from the next completed quest.' }, ingredients: [{ name: '[Rare Crystal]', count: 3 }, { name: '[Uncommon Material Chunk]', count: 5 }] },
+                { result: { name: '[Lesser Stat Point Crystal]', type: 'stat_point', value: 1, rarity: 'epic', description: 'Grants 1 stat point.' }, ingredients: [{ name: '[Epic Gem]', count: 5 }] },
+                { result: { name: '[Scroll of Amplification]', type: 'special', effect: 'double_exp_5', rarity: 'epic', description: 'Doubles EXP gain from the next 5 completed quests.' }, ingredients: [{ name: '[Epic Gem]', count: 3 }, { name: '[Rare Crystal]', count: 8 }] },
+                { result: { name: '[Scroll of Bounty]', type: 'special', effect: 'guaranteed_reward_5', rarity: 'epic', description: 'Guarantees a reward from the next 5 completed quests.' }, ingredients: [{ name: '[Epic Gem]', count: 3 }, { name: '[Rare Crystal]', count: 8 }] },
+                { result: { name: '[Greater Stat Point Crystal]', type: 'stat_point', value: 5, rarity: 'legendary', description: 'Grants 5 stat points.' }, ingredients: [{ name: '[Legendary Essence]', count: 3 }, { name: '[Epic Gem]', count: 10 }] },
+                { result: { name: '[Instant Level Up Token]', type: 'level_up_token', rarity: 'epic', description: 'Grants one full level.' }, ingredients: [{ name: '[Legendary Essence]', count: 1 }, { name: '[Epic Gem]', count: 5 }] },
+                { result: { name: '[Title: The Alchemist]', type: 'title_unlock', title: '[The Alchemist]', rarity: 'legendary', description: 'A title for one who masters the art of transmutation.' }, ingredients: [{ name: '[Legendary Essence]', count: 10 }] },
+                 // --- END OF EXPANDED CRAFTING RECIPES ---
+            ];
+            const RANKS = ['F', 'E', 'D', 'C', 'B', 'A', 'S', 'SS', 'SSS'];
+            const TITLES = {
+                // --- START OF EXPANDED TITLES ---
+                5: '[Novice Learner]', 10: '[Streak Keeper]', 15: '[Diligent Student]', 20: '[Chapter Conqueror]', 25: '[Adept Scholar]', 30: '[Focused Mind]',
+                35: '[Syllabus Navigator]', 40: '[Knowledge Seeker]', 45: '[Theorycrafter]', 50: '[Elite Scholar]',
+                55: '[Paragraph Pilgrim]', 60: '[Curriculum Champion]', 65: '[Master of Modules]', 70: '[Dean\'s List Candidate]',
+                75: '[Virtuoso of Verse]', 80: '[Sage in Training]', 85: '[Grandmaster of Grades]', 90: '[Doctorate of Diligence]',
+                95: '[Honor Roll Herald]', 100: '[The Centurion Scholar]', 105: '[Librarian\'s Favorite]', 110: '[Research Renegade]',
+                115: '[Formula Fiend]', 120: '[Professor\'s Protégé]', 125: '[Intellectual Titan]', 130: '[Cognitive Conqueror]',
+                135: '[Wisdom Weaver]', 140: '[Mind Mason]', 145: '[Thought Tyrant]', 150: '[Academic Archon]',
+                155: '[Bearer of Knowledge]', 160: '[Scribe of the System]', 165: '[Enlightened One]', 170: '[Oracle of the Pages]',
+                175: '[Master of Memory]', 180: '[Lord of the Lecture]', 185: '[Emperor of Exams]', 190: '[Transcendent Mind]',
+                195: '[Living Library]', 200: '[The Ascended]', 210: '[Apex Learner]', 220: '[Lorekeeper]',
+                230: '[Sovereign of Study]', 240: '[Nexus of Knowledge]', 250: '[The Grand Savant]', 260: '[Architect of Acumen]',
+                270: '[Master of Epistemology]', 280: '[Guardian of the Archives]', 290: '[The Erudite]', 300: '[Living Embodiment of Wisdom]',
+                // --- END OF EXPANDED TITLES ---
+            };
+
+            // --- STATE MANAGEMENT ---
+            let user;
+            let activeTab = 'inventory'; // inventory, stats, log, settings
+            let focusTimerInterval;
+            let urgentQuestTimerInterval;
+            let synth;
+
+            const getInitialState = () => ({
+                level: 1, exp: 0, expToNextLevel: 100,
+                rank: 'F-Rank Scholar', title: '[Newbie]',
+                inventory: [], mainQuests: [], dailyQuests: [],
+                lastDailyQuestDate: null,
+                lastUrgentCheckDate: null,
+                urgentQuest: null,
+                stats: { intelligence: 0, wisdom: 0, focus: 0, diligence: 0 },
+                statPoints: 0,
+                log: [`[${new Date().toLocaleTimeString()}] System Initialized. Welcome, Scholar.`],
+                unlockedThemes: { 'Default': THEMES['Default'] },
+                settings: { name: 'Scholar', sound: true, currentTheme: 'Default' },
+            });
+
+            // --- DOM ELEMENTS ---
+            const elements = {
+                statusPane: document.getElementById('status-pane'),
+                userName: document.getElementById('user-name'),
+                userTitle: document.getElementById('user-title'),
+                userLevel: document.getElementById('user-level'),
+                expText: document.getElementById('exp-text'),
+                expBar: document.getElementById('exp-bar'),
+                userRank: document.getElementById('user-rank'),
+                dailyQuestsList: document.getElementById('daily-quests-list'),
+                mainQuestsList: document.getElementById('main-quests-list'),
+                addQuestBtn: document.getElementById('add-quest-btn'),
+                addQuestForm: document.getElementById('add-quest-form'),
+                newQuestInput: document.getElementById('new-quest-input'),
+                saveQuestBtn: document.getElementById('save-quest-btn'),
+                systemModal: document.getElementById('system-message-modal'),
+                systemModalTitle: document.getElementById('system-message-title'),
+                systemModalText: document.getElementById('system-message-text'),
+                systemModalClose: document.getElementById('system-message-close'),
+                dungeonModal: document.getElementById('dungeon-modal'),
+                dungeonTimer: document.getElementById('dungeon-timer'),
+                dungeonTaskName: document.getElementById('dungeon-task-name'),
+                dungeonExitBtn: document.getElementById('dungeon-exit-btn'),
+                dungeonCompleteBtn: document.getElementById('dungeon-complete-btn'),
+                tabButtons: document.getElementById('tab-buttons'),
+                tabContent: document.getElementById('tab-content'),
+                urgentQuestPane: document.getElementById('urgent-quest-pane'),
+                urgentQuestTimer: document.getElementById('urgent-quest-timer'),
+                urgentQuestContent: document.getElementById('urgent-quest-content'),
+            };
+
+            // --- CORE LOGIC ---
+            const saveData = () => localStorage.setItem('projectAscendUserV5', JSON.stringify(user));
+            const loadData = () => {
+                const savedData = localStorage.getItem('projectAscendUserV5');
+                user = savedData ? JSON.parse(savedData) : getInitialState();
+                // Data migration for new features
+                if (!user.hasOwnProperty('urgentQuest')) user.urgentQuest = null;
+                if (!user.hasOwnProperty('lastUrgentCheckDate')) user.lastUrgentCheckDate = null;
+                if (!user.hasOwnProperty('mainQuests')) user.mainQuests = [];
+            };
+            
+            // NEW: Function to remove completed main quests older than 24 hours
+            const cleanupCompletedQuests = () => {
+                if (!user.mainQuests || user.mainQuests.length === 0) return;
+                const twentyFourHoursAgo = Date.now() - (24 * 60 * 60 * 1000);
+                const initialCount = user.mainQuests.length;
+                user.mainQuests = user.mainQuests.filter(quest => {
+                    // Keep quest if it's NOT completed, OR if it was completed within the last 24 hours.
+                    return !quest.completed || (quest.completionTimestamp && quest.completionTimestamp > twentyFourHoursAgo);
+                });
+                if (user.mainQuests.length < initialCount) {
+                    addLog('Cleaned up old completed main quests.');
+                }
+            };
+            
+            const addLog = (message) => {
+                user.log.unshift(`[${new Date().toLocaleTimeString()}] ${message}`);
+                if(user.log.length > 50) user.log.pop();
+            };
+
+            const playSound = (note, duration = '8n') => {
+                if (!user.settings.sound) return;
+                if (window.Tone && window.Tone.context.state !== 'running') {
+                    window.Tone.start();
+                }
+                if (!synth) synth = new window.Tone.Synth().toDestination();
+                synth.triggerAttackRelease(note, duration);
+            };
+
+            const showSystemMessage = (title, text) => {
+                elements.systemModalTitle.textContent = title;
+                elements.systemModalText.innerHTML = text;
+                elements.systemModal.classList.add('modal-enter');
+            };
+            const hideSystemMessage = () => {
+                elements.systemModal.classList.remove('modal-enter');
+            };
+
+            const gainExp = (amount, fromQuest = false) => {
+                if (amount <= 0 && user.exp < user.expToNextLevel) return;
+
+                const intBonus = 1 + (user.stats.intelligence * 0.005);
+                const finalAmount = Math.floor(amount * intBonus);
+                
+                if (finalAmount > 0) {
+                    user.exp += finalAmount;
+                    const bonusText = intBonus > 1 ? ` (+${Math.round((intBonus - 1) * 100)}% INT)` : '';
+                    showSystemMessage('EXP GAINED', `You gained <span class="font-bold text-blue-300 text-glow-blue">${finalAmount} EXP</span>${bonusText}.`);
+                    addLog(`Gained ${finalAmount} EXP.`);
+                }
+                
+                let leveledUp = false;
+                while (user.exp >= user.expToNextLevel) {
+                    user.exp -= user.expToNextLevel;
+                    user.level++;
+                    user.statPoints += 1; // Grant 1 stat point per level
+                    leveledUp = true;
+                    levelUp();
+                }
+
+                if (!leveledUp && amount > 0) playSound('C5');
+
+                if (fromQuest) {
+                    const wisBonus = user.stats.wisdom * 0.005;
+                    const rewardChance = 0.35 + wisBonus;
+                    if (Math.random() < rewardChance) {
+                        setTimeout(grantRandomReward, 1500);
+                    }
+                }
+                
+                updateAllUI();
+                saveData();
+            };
+
+            const levelUp = () => {
+                playSound('G5', '4n');
+                user.expToNextLevel = Math.floor(100 * Math.pow(user.level, 1.5));
+                let message = `You have reached <span class="font-bold rarity-legendary">Level ${user.level}</span>! You earned 1 Stat Point.`;
+
+                const rankIndex = Math.floor(user.level / 10);
+                if (RANKS[rankIndex] && `${RANKS[rankIndex]}-Rank Scholar` !== user.rank) {
+                    user.rank = `${RANKS[rankIndex]}-Rank Scholar`;
+                    message += `<br><br>Your rank has increased to <span class="font-bold text-green-400">[${user.rank}]</span>!`;
+                }
+                
+                // Check for a new title at the current level, or the closest one below it.
+                let closestLevel = Object.keys(TITLES)
+                    .map(Number)
+                    .filter(lvl => lvl <= user.level)
+                    .pop();
+                    
+                if (closestLevel && TITLES[closestLevel] !== user.title) {
+                    user.title = TITLES[closestLevel];
+                    message += `<br><br>You have earned the title: <span class="font-bold rarity-legendary">${user.title}</span>!`;
+                }
+                
+                showSystemMessage("LEVEL UP!", message);
+                addLog(`Leveled up to ${user.level}.`);
+                elements.statusPane.classList.add('level-up-animation');
+                setTimeout(() => elements.statusPane.classList.remove('level-up-animation'), 1500);
+            };
+
+            const grantRandomReward = () => {
+                const rand = Math.random() * 100;
+                let rarity;
+                if (rand < 50) rarity = 'common';
+                else if (rand < 75) rarity = 'uncommon';
+                else if (rand < 90) rarity = 'rare';
+                else if (rand < 97) rarity = 'epic';
+                else rarity = 'legendary';
+
+                const possibleRewards = REWARDS_POOL.filter(r => r.rarity === rarity);
+                if (possibleRewards.length === 0) return;
+                const chosenReward = { ...possibleRewards[Math.floor(Math.random() * possibleRewards.length)] };
+                
+                user.inventory.push(chosenReward);
+                playSound('E5');
+                showSystemMessage('REWARD OBTAINED', `You found a <span class="font-bold rarity-${chosenReward.rarity}">${chosenReward.name}</span>!`);
+                addLog(`Obtained item: ${chosenReward.name}.`);
+                updateAllUI();
+                saveData();
+            };
+
+            const hexToRgb = (hex) => {
+                let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : '0, 0, 0';
+            };
+
+            const applyTheme = (theme) => {
+                if(!theme) theme = THEMES['Default'];
+                const root = document.documentElement;
+                root.style.setProperty('--primary-text-color', theme.primary);
+                root.style.setProperty('--secondary-text-color', theme.secondary);
+                root.style.setProperty('--primary-glow-color', `rgba(${hexToRgb(theme.primary)}, 0.5)`);
+                root.style.setProperty('--secondary-glow-color', `rgba(${hexToRgb(theme.secondary)}, 0.5)`);
+            };
+
+             const useItem = (index) => {
+                const item = user.inventory[index];
+                if (!item) return;
+                
+                let itemUsed = true;
+                let notificationTitle = 'ITEM USED';
+                let notificationText = `Used ${item.name}.`;
+
+                switch (item.type) {
+                    case 'exp_potion':
+                        gainExp(item.value);
+                        notificationText = `${item.name} granted ${item.value} EXP.`
+                        break;
+                    case 'rest_token':
+                         user.dailyQuests.forEach(q => { if (!q.completed) q.completed = true; });
+                         notificationText = 'All daily quests have been completed.';
+                         break;
+                    case 'quest_reroll':
+                        generateDailyQuests(true);
+                        notificationText = 'Your daily quests have been rerolled.';
+                        break;
+                    case 'theme_key':
+                        if (item.colors) {
+                            const themeName = item.name.replace('[Theme Key: ', '').replace(']', '');
+                            user.unlockedThemes[themeName] = item.colors;
+                            user.settings.currentTheme = themeName;
+                            applyTheme(item.colors);
+                            notificationText = `UI Theme changed to ${themeName}.`;
+                        }
+                        break;
+                    case 'title_unlock':
+                        if (item.title) {
+                            user.title = item.title;
+                            notificationTitle = 'TITLE EQUIPPED';
+                            notificationText = `You now bear the title: <span class="font-bold rarity-legendary">${item.title}</span>`;
+                        }
+                        break;
+                    case 'level_up_token':
+                        user.exp = user.expToNextLevel;
+                        gainExp(0);
+                        notificationText = 'You feel a surge of power and instantly level up!';
+                        break;
+                    default:
+                        notificationTitle = 'SYSTEM';
+                        notificationText = 'This item has no use... yet.';
+                        itemUsed = false;
+                        break;
+                }
+                
+                if (itemUsed) {
+                    user.inventory.splice(index, 1);
+                    playSound('A4');
+                    showSystemMessage(notificationTitle, notificationText);
+                    addLog(`Used item: ${item.name}.`);
+                    updateAllUI();
+                    saveData();
+                } else {
+                    playSound('C4');
+                    showSystemMessage(notificationTitle, notificationText);
+                }
+            };
+            
+            const generateDailyQuests = (force = false) => {
+                const today = new Date().toISOString().slice(0, 10);
+                if (!force && user.lastDailyQuestDate === today) return;
+
+                const shuffled = [...DAILY_QUEST_POOL].sort(() => 0.5 - Math.random());
+                const diligenceBonus = Math.floor(user.stats.diligence / 10);
+                user.dailyQuests = shuffled.slice(0, 3 + diligenceBonus).map((quest, i) => ({
+                    ...quest, id: `d${Date.now()}-${i}`, completed: false
+                }));
+                user.lastDailyQuestDate = today;
+                addLog('New daily quests generated.');
+            };
+
+            const generateUrgentQuest = () => {
+                const quest = URGENT_QUEST_POOL[Math.floor(Math.random() * URGENT_QUEST_POOL.length)];
+                user.urgentQuest = {
+                    ...quest,
+                    id: `u${Date.now()}`,
+                    completed: false,
+                    expiry: Date.now() + 24 * 60 * 60 * 1000 // 24 hours from now
+                };
+                addLog(`An urgent quest has appeared: ${quest.description}`);
+                showSystemMessage("URGENT QUEST", `A new high-reward quest is available for the next 24 hours!`);
+            };
+            
+            const checkForNewUrgentQuest = () => {
+                const today = new Date().toISOString().slice(0, 10);
+                // Expire old quest
+                if (user.urgentQuest && Date.now() > user.urgentQuest.expiry) {
+                    addLog(`Urgent quest expired: ${user.urgentQuest.description}`);
+                    user.urgentQuest = null;
+                }
+                // Check if we should try to generate a new one
+                if (user.lastUrgentCheckDate !== today) {
+                    user.lastUrgentCheckDate = today;
+                    if (!user.urgentQuest && Math.random() < 0.25) { // 25% chance per day
+                        generateUrgentQuest();
+                    }
+                }
+            };
+
+            const startFocusDungeon = (quest) => {
+                playSound('B4');
+                elements.dungeonTaskName.textContent = quest.description;
+                elements.dungeonModal.classList.remove('hidden');
+                elements.dungeonModal.classList.add('flex');
+                
+                let duration = 25 * 60; // 25 minutes
+                elements.dungeonCompleteBtn.onclick = () => {
+                    const elapsed = (25 * 60) - duration;
+                    const proportion = elapsed / (25*60);
+                    const focusBonus = 25 * (1 + user.stats.focus * 0.01);
+                    const earnedExp = Math.floor(focusBonus * proportion);
+
+                    clearInterval(focusTimerInterval);
+                    elements.dungeonModal.classList.add('hidden');
+                    elements.dungeonModal.classList.remove('flex');
+                    document.title = 'Project Ascend';
+                    playSound('G5');
+                    showSystemMessage('DUNGEON CONQUERED!', `You completed the focus session early and earned ${earnedExp} EXP!`);
+                    gainExp(earnedExp);
+                };
+
+                focusTimerInterval = setInterval(() => {
+                    const minutes = String(Math.floor(duration / 60)).padStart(2, '0');
+                    const seconds = String(duration % 60).padStart(2, '0');
+                    
+                    elements.dungeonTimer.textContent = `${minutes}:${seconds}`;
+                    document.title = `${minutes}:${seconds} - In Dungeon`;
+                    
+                    if (--duration < 0) {
+                        clearInterval(focusTimerInterval);
+                        elements.dungeonModal.classList.add('hidden');
+                        elements.dungeonModal.classList.remove('flex');
+                        document.title = 'Project Ascend';
+                        playSound('G5');
+                        const focusBonus = 25 * (1 + user.stats.focus * 0.01);
+                        showSystemMessage('DUNGEON CONQUERED!', `You have successfully completed the focus session. You earned a bonus ${Math.floor(focusBonus)} EXP!`);
+                        gainExp(focusBonus);
+                    }
+                }, 1000);
+            };
+        
+            const exitFocusDungeon = () => {
+                clearInterval(focusTimerInterval);
+                playSound('C4');
+                elements.dungeonModal.classList.add('hidden');
+                elements.dungeonModal.classList.remove('flex');
+                document.title = 'Project Ascend';
+                showSystemMessage('DUNGEON ABANDONED', 'You have left the focus session early. No rewards gained.');
+            };
+
+            // --- UI RENDER FUNCTIONS ---
+            const updateStatusUI = () => {
+                elements.userName.textContent = user.settings.name;
+                elements.userTitle.textContent = user.title;
+                elements.userLevel.textContent = user.level;
+                elements.expText.textContent = `${Math.floor(user.exp)} / ${user.expToNextLevel} EXP`;
+                elements.expBar.style.width = `${(user.exp / user.expToNextLevel) * 100}%`;
+                elements.userRank.textContent = `[${user.rank}]`;
+            };
+
+            const renderUrgentQuest = () => {
+                clearInterval(urgentQuestTimerInterval);
+                if (user.urgentQuest && !user.urgentQuest.completed) {
+                    elements.urgentQuestPane.classList.remove('hidden');
+                    const quest = user.urgentQuest;
+                    elements.urgentQuestContent.innerHTML = `
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <input type="checkbox" class="quest-checkbox mr-3" data-quest-id="${quest.id}" data-is-urgent="true" ${quest.completed ? 'checked disabled' : ''}>
+                                <label>${quest.description}</label>
+                            </div>
+                            <span class="font-bold text-glow-legendary text-amber-300">+${quest.exp} EXP</span>
+                        </div>
+                    `;
+
+                    const updateTimer = () => {
+                        const remaining = quest.expiry - Date.now();
+                        if (remaining <= 0) {
+                            elements.urgentQuestTimer.textContent = "Expired";
+                            clearInterval(urgentQuestTimerInterval);
+                            checkForNewUrgentQuest(); // Re-check to clear it
+                            updateAllUI();
+                        } else {
+                            const hours = String(Math.floor(remaining / 3600000)).padStart(2, '0');
+                            const minutes = String(Math.floor((remaining % 3600000) / 60000)).padStart(2, '0');
+                            const seconds = String(Math.floor((remaining % 60000) / 1000)).padStart(2, '0');
+                            elements.urgentQuestTimer.textContent = `${hours}:${minutes}:${seconds}`;
+                        }
+                    };
+                    updateTimer();
+                    urgentQuestTimerInterval = setInterval(updateTimer, 1000);
+                } else {
+                    elements.urgentQuestPane.classList.add('hidden');
+                }
+            };
+
+            const renderDailyQuests = () => {
+                elements.dailyQuestsList.innerHTML = user.dailyQuests.map(quest => `
+                    <div class="flex items-center justify-between p-3 rounded transition-all duration-300 ${quest.completed ? 'bg-gray-700/50 text-gray-500' : 'bg-gray-800/50 hover:bg-gray-800'}">
+                        <div class="flex items-center">
+                            <input type="checkbox" class="quest-checkbox mr-3" data-quest-id="${quest.id}" data-is-daily="true" ${quest.completed ? 'checked disabled' : ''}>
+                            <label class="${quest.completed ? 'line-through' : ''}">${quest.description}</label>
+                        </div>
+                        <span class="font-bold text-glow-purple text-purple-300">+${quest.exp} EXP</span>
+                    </div>
+                `).join('');
+            };
+
+            const renderMainQuests = () => {
+                if (user.mainQuests.length === 0) {
+                    elements.mainQuestsList.innerHTML = '<p class="text-gray-500">No main quests accepted. Click \'+\' to add one.</p>';
+                    return;
+                }
+                elements.mainQuestsList.innerHTML = user.mainQuests.map(quest => `
+                    <div class="p-3 rounded transition-all duration-300 ${quest.completed ? 'bg-gray-700/50 text-gray-500' : 'bg-gray-800/50'}">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center flex-grow">
+                                <input type="checkbox" class="quest-checkbox mr-3" data-quest-id="${quest.id}" ${quest.completed ? 'checked disabled' : ''}>
+                                <div class="w-full">
+                                    <label class="${quest.completed ? 'line-through' : ''}">${quest.description}</label>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-3 flex-shrink-0 ml-4">
+                                <button class="start-focus-btn text-purple-400 hover:text-purple-300 transition-transform transform hover:scale-110" data-quest-id="${quest.id}" title="Start Focus Session" ${quest.completed ? 'style="display:none;"' : ''}>&#9200;</button>
+                                <button class="delete-quest-btn text-red-500 hover:text-red-400 transition-transform transform hover:scale-110" data-quest-id="${quest.id}" title="Delete Quest">&times;</button>
+                                <span class="font-bold text-glow-blue text-blue-300">+${quest.exp} EXP</span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            };
+
+            const renderTabs = () => {
+                const contentEl = elements.tabContent;
+                switch(activeTab) {
+                    case 'inventory':
+                        const inventoryCount = user.inventory.reduce((acc, item) => { acc[item.name] = (acc[item.name] || 0) + 1; return acc; }, {});
+                        const uniqueItems = [...new Map(user.inventory.map(item => [item.name, item])).values()];
+
+                        contentEl.innerHTML = `
+                            <h3 class="text-lg font-orbitron text-glow-blue mb-2">Inventory</h3>
+                            <div class="space-y-3">
+                                ${uniqueItems.length === 0 ? '<p class="text-gray-500">No items yet.</p>' : uniqueItems.map((item, index) => `
+                                    <div class="flex justify-between items-center bg-gray-800/50 p-2 rounded">
+                                        <span class="rarity-${item.rarity}" title="${item.description}">${item.name} ${inventoryCount[item.name] > 1 ? `x${inventoryCount[item.name]}` : ''}</span>
+                                        <button data-item-index="${user.inventory.findIndex(i => i.name === item.name)}" class="use-item-btn bg-blue-500 text-xs px-2 py-1 rounded hover:bg-blue-400">Use</button>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <h3 class="text-lg font-orbitron text-glow-blue mt-4 mb-2">Crafting</h3>
+                            <div class="space-y-3">
+                                ${CRAFTING_RECIPES.map((recipe, index) => {
+                                    const canCraft = recipe.ingredients.every(ing => (inventoryCount[ing.name] || 0) >= ing.count);
+                                    return `
+                                        <div class="bg-gray-800/50 p-2 rounded">
+                                            <div class="flex justify-between items-center">
+                                                <div>
+                                                    <span class="font-bold rarity-${recipe.result.rarity}">${recipe.result.name}</span>
+                                                    <div class="text-xs text-gray-400">
+                                                        Requires: ${recipe.ingredients.map(ing => `${ing.count}x ${ing.name}`).join(', ')}
+                                                    </div>
+                                                </div>
+                                                <button data-craft-index="${index}" ${!canCraft ? 'disabled' : ''} class="craft-item-btn bg-purple-600 text-xs px-2 py-1 rounded disabled:bg-gray-600 disabled:cursor-not-allowed hover:bg-purple-500">Craft</button>
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        `;
+                        break;
+                    case 'stats':
+                        const statTooltips = {
+                            intelligence: "Increases EXP gain from all sources by 0.5% per point.",
+                            wisdom: "Increases the chance of finding a reward by 0.5% per point.",
+                            focus: "Increases bonus EXP from Focus Dungeons by 1% per point.",
+                            diligence: "Unlocks an additional daily quest slot every 10 points."
+                        };
+                        contentEl.innerHTML = `
+                            <p class="text-center mb-4">Stat Points available: <span class="font-bold text-glow-blue text-xl">${user.statPoints}</span></p>
+                            <div class="space-y-3">
+                                ${Object.keys(user.stats).map(statName => `
+                                    <div class="flex justify-between items-center bg-gray-800/50 p-2 rounded">
+                                        <span class="capitalize font-bold" title="${statTooltips[statName]}">${statName}: <span class="text-glow-blue">${user.stats[statName]}</span></span>
+                                        <button data-stat-name="${statName}" ${user.statPoints === 0 ? 'disabled' : ''} class="allocate-stat-btn bg-blue-600 text-white w-6 h-6 rounded flex items-center justify-center disabled:bg-gray-600 hover:bg-blue-500">+</button>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `;
+                        break;
+                    case 'log':
+                        contentEl.innerHTML = `
+                            <div class="space-y-2 text-sm text-gray-400">
+                                ${user.log.map(entry => `<p>${entry}</p>`).join('')}
+                            </div>
+                        `;
+                        break;
+                    case 'settings':
+                        contentEl.innerHTML = `
+                           <div class="space-y-4">
+                                <div>
+                                    <label class="block text-gray-400 mb-1">Name</label>
+                                    <input type="text" id="setting-name-input" value="${user.settings.name}" class="bg-gray-800 border border-gray-600 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"/>
+                                </div>
+                               <div>
+                                    <label class="block text-gray-400 mb-1">Theme</label>
+                                    <select id="setting-theme-select" class="bg-gray-800 border border-gray-600 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        ${Object.keys(user.unlockedThemes).map(themeName => `<option value="${themeName}" ${user.settings.currentTheme === themeName ? 'selected' : ''}>${themeName}</option>`).join('')}
+                                    </select>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                     <label class="text-gray-400">Sound Effects</label>
+                                     <button id="setting-sound-btn" class="px-4 py-1 rounded ${user.settings.sound ? 'bg-green-600' : 'bg-red-600'}">
+                                         ${user.settings.sound ? 'ON' : 'OFF'}
+                                     </button>
+                                </div>
+                                <div>
+                                     <label class="block text-gray-400 mb-1">Data Management</label>
+                                     <div class="flex space-x-2">
+                                         <button id="setting-export-btn" class="bg-blue-600 text-sm w-full py-2 rounded hover:bg-blue-500">Export</button>
+                                         <button id="setting-import-btn" class="bg-blue-600 text-sm w-full py-2 rounded hover:bg-blue-500">Import</button>
+                                     </div>
+                                </div>
+                           </div>
+                        `;
+                        break;
+                }
+            };
+
+            const updateAllUI = () => {
+                updateStatusUI();
+                renderUrgentQuest();
+                renderDailyQuests();
+                renderMainQuests();
+                renderTabs();
+            };
+
+            // --- EVENT LISTENERS ---
+            const setupEventListeners = () => {
+                elements.addQuestBtn.addEventListener('click', () => {
+                    elements.addQuestForm.classList.toggle('hidden');
+                    if (!elements.addQuestForm.classList.contains('hidden')) {
+                        elements.newQuestInput.focus();
+                    }
+                });
+                elements.saveQuestBtn.addEventListener('click', () => {
+                    const description = elements.newQuestInput.value.trim();
+                    if (description) {
+                        const randomExp = Math.floor(Math.random() * 151) + 50; // Random EXP between 50 and 200
+                        user.mainQuests.push({ id: `m${Date.now()}`, description, exp: randomExp, completed: false });
+                        addLog(`Added custom quest: ${description}.`);
+                        elements.newQuestInput.value = '';
+                        elements.addQuestForm.classList.add('hidden');
+                        updateAllUI();
+                        saveData();
+                    }
+                });
+
+                // UPDATED: Event listener for quest completion
+                document.body.addEventListener('change', e => {
+                    const target = e.target;
+                    if (target.matches('.quest-checkbox')) {
+                        const questId = target.dataset.questId;
+                        let quest;
+                        let isMainQuest = false;
+
+                        if (target.dataset.isDaily === 'true') {
+                             quest = user.dailyQuests.find(q => q.id === questId);
+                        } else if (target.dataset.isUrgent === 'true') {
+                            quest = user.urgentQuest;
+                        } else {
+                             quest = user.mainQuests.find(q => q.id === questId);
+                             if (quest) isMainQuest = true;
+                        }
+                        
+                        if (quest && !quest.completed) {
+                            // 1. Modify state FIRST to prevent re-clicking for EXP
+                            quest.completed = true;
+                            if (isMainQuest) {
+                                quest.completionTimestamp = Date.now();
+                            }
+
+                            addLog(`Completed quest: ${quest.description}.`);
+                            
+                            // 2. Grant EXP. This function also updates the UI and saves the data,
+                            // reflecting the 'completed' state change, which disables the checkbox.
+                            gainExp(quest.exp, true);
+                            
+                            // 3. Handle special case for urgent quests which need to be removed completely
+                            if (target.dataset.isUrgent === 'true') {
+                                user.urgentQuest = null; // Clear it from state
+                                updateAllUI(); // Force another UI update to remove the urgent quest pane
+                                saveData(); // and save this change
+                            }
+                        }
+                    }
+                });
+
+                elements.mainQuestsList.addEventListener('click', e => {
+                    const target = e.target.closest('button');
+                    if (!target) return;
+                    
+                    if (target.matches('.start-focus-btn')) {
+                        const quest = user.mainQuests.find(q => q.id === target.dataset.questId);
+                        if(quest) startFocusDungeon(quest);
+                    } else if (target.matches('.delete-quest-btn')) {
+                        const questId = target.dataset.questId;
+                        const questToDelete = user.mainQuests.find(q => q.id === questId);
+                        if (questToDelete && confirm(`Are you sure you want to delete the quest: "${questToDelete.description}"?`)) {
+                             user.mainQuests = user.mainQuests.filter(q => q.id !== questId);
+                             addLog(`Deleted quest: ${questToDelete.description}.`);
+                             updateAllUI();
+                             saveData();
+                        }
+                    }
+                });
+
+                elements.tabButtons.addEventListener('click', e => {
+                    const target = e.target;
+                    if (target.matches('.tab-button')) {
+                        activeTab = target.dataset.tab;
+                        elements.tabButtons.querySelectorAll('.tab-button').forEach(btn => {
+                            btn.classList.toggle('text-glow-blue', btn.dataset.tab === activeTab);
+                            btn.classList.toggle('text-gray-400', btn.dataset.tab !== activeTab);
+                        });
+                        renderTabs();
+                    }
+                });
+
+                elements.tabContent.addEventListener('click', e => {
+                    const target = e.target;
+                    if (target.matches('.use-item-btn')) useItem(parseInt(target.dataset.itemIndex));
+                    if (target.matches('.craft-item-btn')) {
+                        const recipe = CRAFTING_RECIPES[parseInt(target.dataset.craftIndex)];
+                        const inventoryCount = user.inventory.reduce((acc, item) => { acc[item.name] = (acc[item.name] || 0) + 1; return acc; }, {});
+                        const canCraft = recipe.ingredients.every(ing => (inventoryCount[ing.name] || 0) >= ing.count);
+                        if (canCraft) {
+                            recipe.ingredients.forEach(ing => {
+                                for (let i = 0; i < ing.count; i++) {
+                                    const itemIndex = user.inventory.findIndex(item => item.name === ing.name);
+                                    if (itemIndex > -1) user.inventory.splice(itemIndex, 1);
+                                }
+                            });
+                            user.inventory.push({ ...recipe.result });
+                            showSystemMessage('CRAFTING SUCCESS', `You crafted <span class="font-bold rarity-${recipe.result.rarity}">${recipe.result.name}</span>!`);
+                            addLog(`Crafted ${recipe.result.name}.`);
+                            playSound('F5');
+                            updateAllUI();
+                            saveData();
+                        } else {
+                            showSystemMessage('CRAFTING FAILED', 'You lack the required materials.');
+                            playSound('C4');
+                        }
+                    }
+                    if (target.matches('.allocate-stat-btn')) {
+                        const statName = target.dataset.statName;
+                        if (user.statPoints > 0) {
+                            user.stats[statName]++;
+                            user.statPoints--;
+                            addLog(`Allocated point to ${statName.toUpperCase()}.`);
+                            updateAllUI();
+                            saveData();
+                        }
+                    }
+                    if (target.id === 'setting-sound-btn') {
+                        user.settings.sound = !user.settings.sound;
+                        addLog(`Sound effects ${user.settings.sound ? 'enabled' : 'disabled'}.`);
+                        updateAllUI();
+                        saveData();
+                    }
+                    if (target.id === 'setting-export-btn') {
+                        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(user));
+                        const dlAnchorElem = document.createElement('a');
+                        dlAnchorElem.setAttribute("href", dataStr);
+                        dlAnchorElem.setAttribute("download", `project_ascend_save_${Date.now()}.json`);
+                        dlAnchorElem.click();
+                        dlAnchorElem.remove();
+                        addLog('Exported save data.');
+                    }
+                    if (target.id === 'setting-import-btn') {
+                        const input = document.createElement('input');
+                        input.type = 'file';
+                        input.accept = '.json';
+                        input.onchange = e => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                                const reader = new FileReader();
+                                reader.onload = (event) => {
+                                    try {
+                                        const importedData = JSON.parse(event.target?.result);
+                                        user = { ...getInitialState(), ...importedData }; // Merge with default state to handle new properties
+                                        addLog('Imported save data.');
+                                        applyTheme(user.unlockedThemes[user.settings.currentTheme] || THEMES['Default']);
+                                        updateAllUI();
+                                        saveData();
+                                    } catch (err) {
+                                        console.error("Import failed:", err);
+                                        showSystemMessage("IMPORT FAILED", "The selected file is not valid save data.");
+                                    }
+                                };
+                                reader.readAsText(file);
+                            }
+                        };
+                        input.click();
+                    }
+                });
+
+                elements.tabContent.addEventListener('change', e => {
+                    const target = e.target;
+                    if (target.id === 'setting-name-input') {
+                        user.settings.name = target.value;
+                        updateStatusUI();
+                        saveData();
+                    }
+                    if (target.id === 'setting-theme-select') {
+                        user.settings.currentTheme = target.value;
+                        applyTheme(user.unlockedThemes[user.settings.currentTheme]);
+                        addLog(`Theme changed to ${user.settings.currentTheme}.`);
+                        updateAllUI();
+                        saveData();
+                    }
+                });
+
+                elements.systemModalClose.addEventListener('click', hideSystemMessage);
+                elements.dungeonExitBtn.addEventListener('click', exitFocusDungeon);
+            };
+
+            // --- INITIALIZATION ---
+            const init = () => {
+                loadData();
+                cleanupCompletedQuests(); // Clean up old main quests on load
+                generateDailyQuests();
+                checkForNewUrgentQuest();
+                applyTheme(user.unlockedThemes[user.settings.currentTheme]);
+                updateAllUI();
+                setupEventListeners();
+                if (!localStorage.getItem('projectAscendUserV5')) {
+                    showSystemMessage('AWAKENING', 'You have been selected by the <span class="text-blue-400">System</span>.<br>Log your tasks as "Main Quests" and complete "Daily Quests" to grow stronger. It is time to level up.');
+                }
+            };
+
+            init();
+        });
+    </script>
+</body>
+</html>
